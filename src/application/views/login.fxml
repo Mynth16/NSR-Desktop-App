@@ -1,14 +1,133 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="application.views.Login"
-            prefHeight="400.0" prefWidth="600.0">
+<VBox alignment="CENTER" prefHeight="580.0" prefWidth="410.0"
+      style="-fx-background-color: #f5f5f5;"
+      xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1">
 
-</AnchorPane>
+    <padding>
+        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
+    </padding>
+
+    <!-- Logo -->
+    <ImageView fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true">
+        <VBox.margin>
+            <Insets bottom="20.0"/>
+        </VBox.margin>
+        <Image url="@/application/assets/NSRLogo.png"/>
+    </ImageView>
+
+    <!-- Title -->
+    <Label text="Barangay New San Roque" textFill="#2d5016" wrapText="true" textAlignment="CENTER">
+        <font>
+            <Font name="System Bold" size="24.0"/>
+        </font>
+        <VBox.margin>
+            <Insets bottom="5.0"/>
+        </VBox.margin>
+    </Label>
+
+    <!-- Subtitle -->
+    <Label text="Population Management System" textFill="#8b7355">
+        <font>
+            <Font size="14.0"/>
+        </font>
+        <VBox.margin>
+            <Insets bottom="30.0"/>
+        </VBox.margin>
+    </Label>
+
+    <!-- Username Label -->
+    <Label text="Username" textFill="#333333">
+        <font>
+            <Font name="System Bold" size="13.0"/>
+        </font>
+        <VBox.margin>
+            <Insets bottom="8.0"/>
+        </VBox.margin>
+    </Label>
+
+    <!-- Username Field -->
+    <HBox alignment="CENTER_LEFT"
+          style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #cccccc; -fx-border-radius: 8; -fx-border-width: 1;">
+        <padding>
+            <Insets bottom="12.0" left="15.0" right="15.0" top="12.0"/>
+        </padding>
+        <Label text="👤" textFill="#999999">
+            <font>
+                <Font size="16.0"/>
+            </font>
+            <HBox.margin>
+                <Insets right="10.0"/>
+            </HBox.margin>
+        </Label>
+        <TextField fx:id="usernameField" promptText="Enter your username"
+                   style="-fx-background-color: transparent; -fx-border-width: 0;">
+            <font>
+                <Font size="13.0"/>
+            </font>
+        </TextField>
+        <VBox.margin>
+            <Insets bottom="20.0"/>
+        </VBox.margin>
+    </HBox>
+
+    <!-- Password Label -->
+    <Label text="Password" textFill="#333333">
+        <font>
+            <Font name="System Bold" size="13.0"/>
+        </font>
+        <VBox.margin>
+            <Insets bottom="8.0"/>
+        </VBox.margin>
+    </Label>
+
+    <!-- Password Field -->
+    <HBox alignment="CENTER_LEFT"
+          style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #cccccc; -fx-border-radius: 8; -fx-border-width: 1;">
+        <padding>
+            <Insets bottom="12.0" left="15.0" right="15.0" top="12.0"/>
+        </padding>
+        <Label text="🔒" textFill="#999999">
+            <font>
+                <Font size="16.0"/>
+            </font>
+            <HBox.margin>
+                <Insets right="10.0"/>
+            </HBox.margin>
+        </Label>
+        <PasswordField fx:id="passwordField" promptText="Enter your password"
+                       style="-fx-background-color: transparent; -fx-border-width: 0;">
+            <font>
+                <Font size="13.0"/>
+            </font>
+        </PasswordField>
+        <VBox.margin>
+            <Insets bottom="25.0"/>
+        </VBox.margin>
+    </HBox>
+
+    <!-- Sign In Button -->
+    <Button fx:id="signInButton" maxWidth="Infinity" mnemonicParsing="false"
+            style="-fx-background-color: #28a745; -fx-background-radius: 8; -fx-text-fill: white; -fx-cursor: hand;"
+            text="➜  Sign In">
+        <font>
+            <Font name="System Bold" size="15.0"/>
+        </font>
+        <padding>
+            <Insets bottom="15.0" left="20.0" right="20.0" top="15.0"/>
+        </padding>
+    </Button>
+
+</VBox>
