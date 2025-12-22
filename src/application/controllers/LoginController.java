@@ -25,6 +25,9 @@ public class LoginController {
     @FXML
     private void initialize() {
         signInButton.setOnAction(e -> handleSignIn());
+
+        // Allow Enter key to submit
+        passwordField.setOnAction(e -> handleSignIn());
     }
 
     private void handleSignIn() {
@@ -43,10 +46,26 @@ public class LoginController {
             return;
         }
 
+        // Successful login - navigate to dashboard
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/application/views/dashboard.fxml"));
+            Parent root = loader.load();
 
+            // Pass the account to the dashboard controller
+            DashboardController dashboardController = loader.getController();
+            dashboardController.setAccount(account);
+
+            Scene scene = new Scene(root);
+            Stage stage = (Stage) signInButton.getScene().getWindow();
+            stage.setScene(scene);
+            stage.setMaximized(true);
+            stage.centerOnScreen();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Failed to load dashboard: " + e.getMessage());
+        }
     }
-
-
 
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR, message);

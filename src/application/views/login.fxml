@@ -14,7 +14,8 @@
 <VBox alignment="CENTER" prefHeight="580.0" prefWidth="410.0"
       style="-fx-background-color: #f5f5f5;"
       xmlns="http://javafx.com/javafx/17"
-      xmlns:fx="http://javafx.com/fxml/1">
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="application.controllers.LoginController">
 
     <padding>
         <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>

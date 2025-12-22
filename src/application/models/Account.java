@@ -1,21 +1,16 @@
 package application.models;
 
 public class Account {
-    private final int id;
     private final String username;
     private final String password;
     private final String role;
 
-    public Account(int id, String username, String password, String role) {
-        this.id = id;
+    public Account(String username, String password, String role) {
         this.username = username;
         this.password = password;
         this.role = role;
     }
 
-    public int getId() {
-        return id;
-    }
 
     public String getUsername() {
         return username;
