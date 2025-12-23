@@ -67,9 +67,6 @@ public class AuditTrailDAO {
 		}
 	}
 
-	/**
-	 * Returns the 3 most recent audit trail entries, ordered by change_date DESC.
-	 */
 	public static List<AuditTrail> getRecentAuditTrails(int count) {
 		List<AuditTrail> list = new ArrayList<>();
 		String sql = "SELECT at.change_date, COALESCE(a.username, 'Unknown') AS username, at.record_type, at.change_type, at.details " +

@@ -70,7 +70,6 @@ public class HouseholdController extends NavigationBaseController {
 		HouseholdDAO dao = new HouseholdDAO();
 		masterData.setAll(dao.getAllHouseholds());
 		filteredData = new FilteredList<>(masterData, hh -> {
-			// Only show households with status 'A' or 'Active'
 			String status = hh.getStatus();
 			return "A".equalsIgnoreCase(status) || "Active".equalsIgnoreCase(status);
 		});
@@ -78,7 +77,6 @@ public class HouseholdController extends NavigationBaseController {
 		searchField.textProperty().addListener((obs, oldVal, newVal) -> {
 			String lower = newVal == null ? "" : newVal.toLowerCase();
 			filteredData.setPredicate(hh -> {
-				// Only show active
 				String status = hh.getStatus();
 				boolean isActive = "A".equalsIgnoreCase(status) || "Active".equalsIgnoreCase(status);
 				return isActive && (
@@ -178,7 +176,6 @@ public class HouseholdController extends NavigationBaseController {
 		}
 	}
 
-	// Open edit modal for household
 	private void openEditHouseholdModal(Household household) {
 		try {
 			javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/application/views/add_household.fxml"));

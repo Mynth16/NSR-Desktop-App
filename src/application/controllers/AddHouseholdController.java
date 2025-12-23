@@ -127,9 +127,6 @@ public class AddHouseholdController extends application.controllers.NavigationBa
         return householdUpdated;
     }
 
-    /**
-     * Call this to set the controller in edit mode and load the household data.
-     */
     public void setEditMode(Household household) {
         this.editMode = true;
         this.originalHousehold = household;

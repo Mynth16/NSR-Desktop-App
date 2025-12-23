@@ -6,8 +6,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
-import application.controllers.NavigationBaseController;
-
 public class EditAccountController extends NavigationBaseController {
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
@@ -76,7 +74,7 @@ public class EditAccountController extends NavigationBaseController {
             showAlert("Please select a role.");
             return;
         }
-        // Map role name to single-character code
+
         String roleCode = "A";
         if (role.equals("Staff")) roleCode = "S";
         else if (role.equals("Viewer")) roleCode = "V";

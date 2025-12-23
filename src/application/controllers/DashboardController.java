@@ -7,7 +7,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import java.util.Map;
 
-// EXTEND the base controller
 public class DashboardController extends NavigationBaseController {
     @FXML private javafx.scene.layout.VBox recentActivityVBox;
     @FXML private Label noRecentActivityLabel;
@@ -115,12 +114,8 @@ public class DashboardController extends NavigationBaseController {
 
     @Override
     protected void navigateToDashboard() {
-        // We are already here, so do nothing (prevents reload)
         System.out.println("Already on Dashboard");
     }
-
-    // For login integration: allow passing account info
-
 
     private void loadDashboardStats() {
         // Population and households

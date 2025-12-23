@@ -4,7 +4,6 @@ import application.models.Account;
 import application.database.AccountDAO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -23,7 +22,6 @@ public class AccountController extends NavigationBaseController {
 	@FXML
 	private Label sidebarUsernameLabel;
 
-	// (Removed duplicate setAccount method)
 	@FXML private TableView<Account> accountTable;
 	@FXML private TableColumn<Account, String> usernameCol;
 	@FXML private TableColumn<Account, String> roleCol;
@@ -38,13 +36,12 @@ public class AccountController extends NavigationBaseController {
 	private String getCurrentUserRole() {
 		if (this.currentAccount != null && this.currentAccount.getRole() != null) {
 			String role = this.currentAccount.getRole();
-			// Accept both single-char and full role names
 			if (role.equalsIgnoreCase("A") || role.equalsIgnoreCase("Admin")) return "Admin";
 			if (role.equalsIgnoreCase("S") || role.equalsIgnoreCase("Staff")) return "Staff";
 			if (role.equalsIgnoreCase("V") || role.equalsIgnoreCase("Viewer")) return "Viewer";
 			return role;
 		}
-		return "Viewer"; // Default to most restrictive
+		return "Viewer";
 	}
 
 	private boolean isAdmin() {

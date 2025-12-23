@@ -26,9 +26,6 @@ public class HouseholdDAO {
 		return 0;
 	}
 
-	/**
-	 * Soft deletes a household by setting its status to 'X'.
-	 */
 	public boolean softDeleteHousehold(Household household) {
 		String sql = "UPDATE households SET status = 'X' WHERE zone_num = ? AND house_num = ?";
 		try (Connection conn = DBConnection.getConnection();
@@ -47,9 +44,6 @@ public class HouseholdDAO {
 		}
 	}
 
-	/**
-	 * Updates a household's zone, house number, and status.
-	 */
 	public boolean updateHousehold(Household oldHousehold, Household newHousehold) {
 		String sql = "UPDATE households SET zone_num = ?, house_num = ?, status = ? WHERE zone_num = ? AND house_num = ?";
 		try (Connection conn = DBConnection.getConnection();
@@ -91,9 +85,7 @@ public class HouseholdDAO {
 		}
 		return zoneMap;
 	}
-	/**
-	 * Returns a list of all households with zone, house number, head of household, resident count, and status.
-	 */
+
 	public List<Household> getAllHouseholds() {
 		List<Household> list = new ArrayList<>();
 		String sql = "SELECT h.zone_num, h.house_num, " +
@@ -120,9 +112,6 @@ public class HouseholdDAO {
 		return list;
 	}
 
-	/**
-	 * Returns a list of HouseholdOption objects for ComboBox population.
-	 */
 	public List<HouseholdOption> getHouseholdOptions() {
 		List<HouseholdOption> list = new ArrayList<>();
 		String sql = "SELECT household_id, zone_num, house_num FROM households ORDER BY zone_num, house_num";
@@ -152,9 +141,7 @@ public class HouseholdDAO {
 		@Override
 		public String toString() { return display; }
 	}
-	/**
-	 * Adds a new household to the database. Only zone and house number are required.
-	 */
+
 	public boolean addHousehold(Household household) {
 		String sql = "INSERT INTO households (zone_num, house_num, status) VALUES (?, ?, 'A')";
 		try (Connection conn = DBConnection.getConnection();

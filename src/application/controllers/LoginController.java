@@ -25,8 +25,6 @@ public class LoginController {
     @FXML
     private void initialize() {
         signInButton.setOnAction(e -> handleSignIn());
-
-        // Allow Enter key to submit
         passwordField.setOnAction(e -> handleSignIn());
     }
 

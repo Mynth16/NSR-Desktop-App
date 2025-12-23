@@ -18,9 +18,6 @@ public abstract class NavigationBaseController {
     @FXML protected Button auditBtn;
     @FXML protected Button logoutBtn;
 
-    /**
-     * Call this method in the initialize() of every child class
-     */
     protected void bindNavigationHandlers() {
         if (dashboardBtn != null) dashboardBtn.setOnAction(e -> navigateToDashboard());
         if (populationBtn != null) populationBtn.setOnAction(e -> navigateToPopulation());
@@ -34,10 +31,6 @@ public abstract class NavigationBaseController {
 
     public void setAccount(application.models.Account account) {
         this.currentAccount = account;
-        // If you want to display username/role in the sidebar, add fx:id to those labels and set here
-        // Example:
-        // if (sidebarNameLabel != null && account != null) sidebarNameLabel.setText(account.getUsername());
-        // if (sidebarRoleLabel != null && account != null) sidebarRoleLabel.setText(account.getRole());
     }
 
     private void navigate(String page, String errorMessage) {
@@ -64,11 +57,6 @@ public abstract class NavigationBaseController {
                 currentScene = new Scene(root);
                 stage.setScene(currentScene);
             }
-
-            // Note: I removed the setWidth/Height/Center calls.
-            // You should set the size ONCE in your Main/Login class,
-            // and let the window stay that size naturally.
-
         } catch (Exception e) {
             e.printStackTrace();
             showError(errorMessage);

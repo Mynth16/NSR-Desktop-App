@@ -20,7 +20,6 @@ public class AccountDAO {
             if (rs.next()) {
                 String hashedPassword = rs.getString("password");
 
-                // Check if password is null or empty
                 if (hashedPassword == null || hashedPassword.isEmpty()) {
                     System.err.println("Stored password is null or empty");
                     return null;
@@ -172,10 +171,6 @@ public class AccountDAO {
         return null;
     }
 
-    /**
-     * Utility method to hash a password for manual database insertion
-     * Usage: String hashed = AccountDAO.hashPassword("mypassword");
-     */
     public static String hashPassword(String plainPassword) {
         return BCrypt.hashpw(plainPassword, BCrypt.gensalt(12));
     }

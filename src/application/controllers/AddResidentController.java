@@ -1,6 +1,5 @@
 package application.controllers;
 
-
 import application.database.ResidentDAO;
 import application.database.AuditTrailDAO;
 import application.models.Account;
@@ -27,8 +26,6 @@ public class AddResidentController {
     @FXML private ComboBox<String> pwdCombo;
     @FXML private Button cancelBtn;
     @FXML private Button saveBtn;
-
-
 
     private void closeWindow() {
         Stage stage = (Stage) cancelBtn.getScene().getWindow();
@@ -77,10 +74,7 @@ public class AddResidentController {
         ResidentDAO dao = new ResidentDAO();
         boolean success;
         if (residentToEdit != null) {
-            // Update existing resident
-            // Only log changed fields
             StringBuilder changes = new StringBuilder();
-            // Helper to clean null, "null", or whitespace to blank
             java.util.function.Function<String, String> clean = s -> (s == null || s.trim().isEmpty() || "null".equalsIgnoreCase(s.trim())) ? "" : s.trim();
 
             String beforeFirstName = clean.apply(residentToEdit.getName().split(" ", 2)[0]);
