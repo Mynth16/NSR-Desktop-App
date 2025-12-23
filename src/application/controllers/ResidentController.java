@@ -2,6 +2,7 @@ package application.controllers;
 
 import application.models.Resident;
 import application.database.ResidentDAO;
+import application.database.AuditTrailDAO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -19,7 +20,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ResidentController extends NavigationBaseController {
-    // Sidebar navigation handlers
+	// Sidebar navigation handlers
+	@FXML
+	private Label sidebarNameLabel;
+	@FXML
+	private Label sidebarRoleLabel;
+	@FXML
+	private Label sidebarUsernameLabel;
 
 
 	@FXML private TableView<Resident> residentTable;
@@ -54,6 +61,10 @@ public class ResidentController extends NavigationBaseController {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/application/views/add_resident.fxml"));
 			Parent root = loader.load();
+			application.controllers.AddResidentController controller = loader.getController();
+			if (this.currentAccount != null) {
+				controller.setCurrentAccount(this.currentAccount);
+			}
 			Stage stage = new Stage();
 			stage.setTitle("Add New Resident");
 			stage.setScene(new Scene(root));
@@ -66,8 +77,31 @@ public class ResidentController extends NavigationBaseController {
 	}
 
 	@FXML
-	    public void initialize() {
+	public void initialize() {
 		bindNavigationHandlers();
+	}
+
+	@Override
+	public void setAccount(application.models.Account account) {
+		super.setAccount(account);
+		if (account != null) {
+			if (sidebarNameLabel != null) {
+				sidebarNameLabel.setText(account.getUsername());
+			}
+			if (sidebarUsernameLabel != null) {
+				sidebarUsernameLabel.setText(account.getUsername());
+			}
+			if (sidebarRoleLabel != null) {
+				String role = account.getRole();
+				String display;
+				if (role == null) display = "Viewer";
+				else if (role.equalsIgnoreCase("A") || role.equalsIgnoreCase("Admin")) display = "Admin";
+				else if (role.equalsIgnoreCase("S") || role.equalsIgnoreCase("Staff")) display = "Staff";
+				else if (role.equalsIgnoreCase("V") || role.equalsIgnoreCase("Viewer")) display = "Viewer";
+				else display = role;
+				sidebarRoleLabel.setText(display);
+			}
+		}
 		nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
 		ageCol.setCellValueFactory(new PropertyValueFactory<>("age"));
 		genderCol.setCellValueFactory(new PropertyValueFactory<>("gender"));
@@ -161,44 +195,44 @@ public class ResidentController extends NavigationBaseController {
 		filterResidents();
 	}
 
-	private void addActionsColumn() {
-		actionsCol.setCellFactory(new Callback<TableColumn<Resident, Void>, TableCell<Resident, Void>>() {
-			@Override
-			public TableCell<Resident, Void> call(final TableColumn<Resident, Void> param) {
-				return new TableCell<Resident, Void>() {
-					private final Button editBtn = new Button("Edit");
-					private final Button deleteBtn = new Button("Delete");
-					{
-						editBtn.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
-						deleteBtn.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
-						editBtn.setOnAction(e -> onEditResident(getTableView().getItems().get(getIndex())));
-						deleteBtn.setOnAction(e -> deleteResident(getTableView().getItems().get(getIndex())));
-					}
-					@Override
-					public void updateItem(Void item, boolean empty) {
-						super.updateItem(item, empty);
-						if (empty) {
-							setGraphic(null);
-						} else if (isViewer()) {
-							editBtn.setDisable(true);
-							deleteBtn.setDisable(true);
-							editBtn.setTooltip(new Tooltip("Viewers cannot edit residents."));
-							deleteBtn.setTooltip(new Tooltip("Viewers cannot delete residents."));
-							HBox box = new HBox(5, editBtn, deleteBtn);
-							setGraphic(box);
-						} else {
-							editBtn.setDisable(false);
-							deleteBtn.setDisable(false);
-							editBtn.setTooltip(null);
-							deleteBtn.setTooltip(null);
-							HBox box = new HBox(5, editBtn, deleteBtn);
-							setGraphic(box);
+		private void addActionsColumn() {
+			actionsCol.setCellFactory(new Callback<TableColumn<Resident, Void>, TableCell<Resident, Void>>() {
+				@Override
+				public TableCell<Resident, Void> call(final TableColumn<Resident, Void> param) {
+					return new TableCell<Resident, Void>() {
+						private final Button editBtn = new Button("Edit");
+						private final Button deleteBtn = new Button("Delete");
+						{
+							editBtn.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;");
+							deleteBtn.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;");
+							editBtn.setOnAction(e -> onEditResident(getTableView().getItems().get(getIndex())));
+							deleteBtn.setOnAction(e -> deleteResident(getTableView().getItems().get(getIndex())));
 						}
-					}
-				};
-			}
-		});
-	}
+						@Override
+						public void updateItem(Void item, boolean empty) {
+							super.updateItem(item, empty);
+							if (empty) {
+								setGraphic(null);
+							} else if (isViewer()) {
+								editBtn.setDisable(true);
+								deleteBtn.setDisable(true);
+								editBtn.setTooltip(new Tooltip("Viewers cannot edit residents."));
+								deleteBtn.setTooltip(new Tooltip("Viewers cannot delete residents."));
+								HBox box = new HBox(10, editBtn, deleteBtn);
+								setGraphic(box);
+							} else {
+								editBtn.setDisable(false);
+								deleteBtn.setDisable(false);
+								editBtn.setTooltip(null);
+								deleteBtn.setTooltip(null);
+								HBox box = new HBox(10, editBtn, deleteBtn);
+								setGraphic(box);
+							}
+						}
+					};
+				}
+			});
+		}
 
 	// Called by the Edit button in the table cell factory
 	public void onEditResident(Resident resident) {
@@ -208,6 +242,9 @@ public class ResidentController extends NavigationBaseController {
 			Parent root = loader.load();
 			application.controllers.AddResidentController controller = loader.getController();
 			controller.setResidentToEdit(resident); // Pre-fill form
+			if (this.currentAccount != null) {
+				controller.setCurrentAccount(this.currentAccount);
+			}
 			Stage stage = new Stage();
 			stage.setTitle("Edit Resident");
 			stage.setScene(new Scene(root));
@@ -228,8 +265,14 @@ public class ResidentController extends NavigationBaseController {
 		alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
 		alert.showAndWait().ifPresent(type -> {
 			if (type == ButtonType.YES) {
+				// Log before state
+				String before = resident.getName() + ", " + resident.getBirthDate() + ", " + resident.getGender() + ", " + resident.getCivilStatus() + ", " + resident.getHousehold() + ", " + resident.getContact() + ", " + resident.getEducationalAttainment() + ", Voter: " + (resident.isRegisteredVoter() ? "Yes" : "No") + ", PWD: " + (resident.isPwd() ? "Yes" : "No");
 				boolean success = residentDAO.deleteResident(resident.getResidentId());
 				if (success) {
+					if (this.currentAccount != null) {
+						String details = "Deleted resident: " + resident.getName();
+						AuditTrailDAO.logDelete(this.currentAccount.getId(), "R", resident.getResidentId(), details);
+					}
 					loadResidents();
 				} else {
 					Alert error = new Alert(Alert.AlertType.ERROR, "Failed to delete resident.", ButtonType.OK);

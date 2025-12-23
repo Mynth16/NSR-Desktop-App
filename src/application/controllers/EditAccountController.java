@@ -82,11 +82,13 @@ public class EditAccountController extends NavigationBaseController {
         else if (role.equals("Viewer")) roleCode = "V";
         String currentUserRole = (this.currentAccount != null && this.currentAccount.getRole() != null) ? this.currentAccount.getRole() : "Viewer";
         boolean success = accountDAO.updateAccount(accountId, username, roleCode, password.isEmpty() ? null : password, currentUserRole);
-        if (success) {
-            closeWindow();
-        } else {
-            showAlert("Failed to update account. Username may already exist.");
+        if (success && this.currentAccount != null) {
+            // Audit log
+            String userId = this.currentAccount.getId();
+            application.database.AuditTrailDAO.logUpdate(userId, "A", accountId, "Updated account: " + username + " (Role: " + roleCode + ")");
         }
+        closeWindow();
+        showAlert("Failed to update account. Username may already exist.");
     }
 
     private void showAlert(String msg) {

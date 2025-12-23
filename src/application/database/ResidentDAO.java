@@ -12,10 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ResidentDAO {
-	public boolean addResident(String firstName, String lastName, String birthDate, String gender, String civilStatus, String householdId, String educationalAttainment, String contact, String email, boolean registeredVoter, boolean pwd) {
+	public String addResident(String firstName, String lastName, String birthDate, String gender, String civilStatus, String householdId, String educationalAttainment, String contact, String email, boolean registeredVoter, boolean pwd) {
 		String sql = "INSERT INTO residents (first_name, last_name, birth_date, gender, civil_status, household_id, educational_attainment, contact_number, email, registered_voter, pwd, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'A')";
 		try (Connection conn = DBConnection.getConnection();
-			 PreparedStatement stmt = conn.prepareStatement(sql)) {
+			 PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
 			stmt.setString(1, firstName);
 			stmt.setString(2, lastName);
 			stmt.setString(3, birthDate);
@@ -28,10 +28,29 @@ public class ResidentDAO {
 			stmt.setString(10, registeredVoter ? "Y" : "N");
 			stmt.setString(11, pwd ? "Y" : "N");
 			int rows = stmt.executeUpdate();
-			return rows > 0;
+			if (rows > 0) {
+				try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+					if (generatedKeys.next()) {
+						return generatedKeys.getString(1);
+					}
+				}
+			}
+			// fallback: try to fetch by unique fields if no generated key
+			String fetchIdSql = "SELECT resident_id FROM residents WHERE first_name=? AND last_name=? AND birth_date=? ORDER BY resident_id DESC LIMIT 1";
+			try (PreparedStatement fetchStmt = conn.prepareStatement(fetchIdSql)) {
+				fetchStmt.setString(1, firstName);
+				fetchStmt.setString(2, lastName);
+				fetchStmt.setString(3, birthDate);
+				try (ResultSet rs = fetchStmt.executeQuery()) {
+					if (rs.next()) {
+						return rs.getString("resident_id");
+					}
+				}
+			}
+			return null;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return false;
+			return null;
 		}
 	}
 

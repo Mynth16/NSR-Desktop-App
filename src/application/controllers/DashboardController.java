@@ -9,6 +9,14 @@ import java.util.Map;
 
 // EXTEND the base controller
 public class DashboardController extends NavigationBaseController {
+    @FXML private javafx.scene.layout.VBox recentActivityVBox;
+    @FXML private Label noRecentActivityLabel;
+    @FXML
+    private Label sidebarNameLabel;
+    @FXML
+    private Label sidebarRoleLabel;
+    @FXML
+    private Label sidebarUsernameLabel;
 
     // --- Dashboard Specific Labels ---
     @FXML private Label totalPopulationLabel;
@@ -48,9 +56,61 @@ public class DashboardController extends NavigationBaseController {
     private void initialize() {
         // 1. Setup Navigation & Sidebar (Inherited)
         bindNavigationHandlers();
-
         // 2. Load Data (Specific to Dashboard)
         loadDashboardStats();
+        // 3. Load Recent Audit Trail Entries
+        loadRecentAuditTrail();
+    }
+
+    private void loadRecentAuditTrail() {
+        recentActivityVBox.getChildren().clear();
+        java.util.List<application.models.AuditTrail> recentEntries = application.database.AuditTrailDAO.getRecentAuditTrails(3);
+        if (recentEntries == null || recentEntries.isEmpty()) {
+            noRecentActivityLabel.setVisible(true);
+        } else {
+            noRecentActivityLabel.setVisible(false);
+            for (application.models.AuditTrail entry : recentEntries) {
+                javafx.scene.layout.HBox hbox = new javafx.scene.layout.HBox(10);
+                hbox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                javafx.scene.shape.Circle circle = new javafx.scene.shape.Circle(6);
+                circle.setFill(javafx.scene.paint.Color.web("#28a745"));
+                javafx.scene.control.Label actionLabel = new javafx.scene.control.Label(entry.getAction());
+                actionLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #333; -fx-font-size: 13px;");
+                javafx.scene.control.Label detailsLabel = new javafx.scene.control.Label(entry.getDetails());
+                detailsLabel.setStyle("-fx-text-fill: #444; -fx-font-size: 12px; -fx-font-style: italic;");
+                javafx.scene.control.Label userLabel = new javafx.scene.control.Label("by " + entry.getUser());
+                userLabel.setStyle("-fx-text-fill: #666; -fx-font-size: 12px;");
+                javafx.scene.control.Label timeLabel = new javafx.scene.control.Label(entry.getDateTime().toString());
+                timeLabel.setStyle("-fx-text-fill: #999; -fx-font-size: 11px;");
+                hbox.getChildren().addAll(circle, actionLabel, detailsLabel, userLabel, timeLabel);
+                recentActivityVBox.getChildren().add(hbox);
+            }
+        }
+    }
+
+
+    @Override
+    public void setAccount(application.models.Account account) {
+        super.setAccount(account);
+        // Set sidebar username and role when account is set
+        if (account != null) {
+            if (sidebarNameLabel != null) {
+                sidebarNameLabel.setText(account.getUsername());
+            }
+            if (sidebarUsernameLabel != null) {
+                sidebarUsernameLabel.setText(account.getUsername());
+            }
+            if (sidebarRoleLabel != null) {
+                String role = account.getRole();
+                String display;
+                if (role == null) display = "Viewer";
+                else if (role.equalsIgnoreCase("A") || role.equalsIgnoreCase("Admin")) display = "Admin";
+                else if (role.equalsIgnoreCase("S") || role.equalsIgnoreCase("Staff")) display = "Staff";
+                else if (role.equalsIgnoreCase("V") || role.equalsIgnoreCase("Viewer")) display = "Viewer";
+                else display = role;
+                sidebarRoleLabel.setText(display);
+            }
+        }
     }
 
     @Override

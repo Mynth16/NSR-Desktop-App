@@ -26,6 +26,57 @@ public class HouseholdDAO {
 		return 0;
 	}
 
+	/**
+	 * Soft deletes a household by setting its status to 'X'.
+	 */
+	public boolean softDeleteHousehold(Household household) {
+		String sql = "UPDATE households SET status = 'X' WHERE zone_num = ? AND house_num = ?";
+		try (Connection conn = DBConnection.getConnection();
+			 PreparedStatement stmt = conn.prepareStatement(sql)) {
+			String zone = household.getZone();
+			if (zone.toLowerCase().startsWith("zone ")) {
+				zone = zone.substring(5).trim();
+			}
+			stmt.setString(1, zone);
+			stmt.setString(2, household.getHouseNumber());
+			int affected = stmt.executeUpdate();
+			return affected > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	/**
+	 * Updates a household's zone, house number, and status.
+	 */
+	public boolean updateHousehold(Household oldHousehold, Household newHousehold) {
+		String sql = "UPDATE households SET zone_num = ?, house_num = ?, status = ? WHERE zone_num = ? AND house_num = ?";
+		try (Connection conn = DBConnection.getConnection();
+			 PreparedStatement stmt = conn.prepareStatement(sql)) {
+			String newZone = newHousehold.getZone();
+			if (newZone.toLowerCase().startsWith("zone ")) {
+				newZone = newZone.substring(5).trim();
+			}
+			String oldZone = oldHousehold.getZone();
+			if (oldZone.toLowerCase().startsWith("zone ")) {
+				oldZone = oldZone.substring(5).trim();
+			}
+			System.out.println("[DEBUG] updateHousehold: newZone=" + newZone + ", newHouse=" + newHousehold.getHouseNumber() + ", oldZone=" + oldZone + ", oldHouse=" + oldHousehold.getHouseNumber());
+			stmt.setString(1, newZone);
+			stmt.setString(2, newHousehold.getHouseNumber());
+			stmt.setString(3, "Active".equalsIgnoreCase(newHousehold.getStatus()) ? "A" : "X");
+			stmt.setString(4, oldZone);
+			stmt.setString(5, oldHousehold.getHouseNumber());
+			int affected = stmt.executeUpdate();
+			System.out.println("[DEBUG] Rows affected: " + affected);
+			return affected > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 	public Map<String, Integer> getHouseholdsByZone() {
 		Map<String, Integer> zoneMap = new HashMap<>();
 		String sql = "SELECT zone_num, COUNT(*) as count FROM households GROUP BY zone_num";

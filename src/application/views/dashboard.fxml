@@ -106,7 +106,7 @@
                         </image>
                     </ImageView>
                     <VBox>
-                        <Label text="admin" textFill="white">
+                        <Label fx:id="sidebarUsernameLabel" text="admin" textFill="white">
                             <font>
                                 <Font name="System Bold" size="12"/>
                             </font>
@@ -607,7 +607,7 @@
                     </padding>
 
                     <HBox alignment="CENTER_LEFT" spacing="10">
-                        <Label text="🕐" style="-fx-font-size: 20px;"/>
+                        <Label text="🕒" style="-fx-font-size: 20px;"/>
                         <Label text="Recent Activity" textFill="#2d5016">
                             <font>
                                 <Font name="System Bold" size="18"/>
@@ -615,14 +615,10 @@
                         </Label>
                     </HBox>
 
-                    <HBox alignment="CENTER_LEFT" spacing="12">
-                        <Circle radius="6" fill="#28a745"/>
-                        <Label text="Initial household registration" textFill="#333">
-                            <font>
-                                <Font size="13"/>
-                            </font>
-                        </Label>
-                    </HBox>
+                    <VBox fx:id="recentActivityVBox" spacing="10">
+                        <!-- Entries will be added dynamically by DashboardController -->
+                        <Label text="No recent activity." textFill="#999" fx:id="noRecentActivityLabel" visible="false"/>
+                    </VBox>
                 </VBox>
             </VBox>
         </ScrollPane>

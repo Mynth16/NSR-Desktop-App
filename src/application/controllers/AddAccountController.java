@@ -78,12 +78,17 @@ public class AddAccountController extends NavigationBaseController {
         else if (role.equals("Viewer")) roleCode = "V";
         // Get current user role from NavigationBaseController
         String currentUserRole = (this.currentAccount != null && this.currentAccount.getRole() != null) ? this.currentAccount.getRole() : "Viewer";
+        System.out.println("[DEBUG] currentAccount: " + (this.currentAccount != null ? this.currentAccount.getUsername() : "null") + ", role: " + currentUserRole);
         boolean success = accountDAO.addAccount(username, password, roleCode, currentUserRole);
-        if (success) {
-            closeWindow();
-        } else {
-            showAlert("Failed to create account. Username may already exist or you lack permission.");
+        if (success && this.currentAccount != null) {
+            // Audit log
+            String userId = this.currentAccount.getId();
+            // Get the new account's id
+            String newAccId = accountDAO.getAccountIdByUsername(username);
+            application.database.AuditTrailDAO.logCreate(userId, "A", newAccId, "Created account: " + username + " (Role: " + roleCode + ")");
         }
+        closeWindow();
+        showAlert("Failed to create account. Username may already exist or you lack permission.");
     }
 
     private void showAlert(String msg) {

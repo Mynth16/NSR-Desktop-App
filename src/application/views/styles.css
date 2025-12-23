@@ -73,3 +73,47 @@
     -fx-padding: 0 32 32 32;
     -fx-effect: dropshadow(gaussian, #e0e0e0, 10, 0, 0, 2);
 }
+
+/* Audit Trail Table Header */
+.table-view .column-header-background {
+    -fx-background-color: #174c2a;
+    -fx-background-radius: 12 12 0 0;
+}
+.table-view .column-header .label {
+    -fx-text-fill: #fff;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+/* Pill Labels for Type and Action */
+.pill-label {
+    -fx-background-color: #e5d6c5;
+    -fx-text-fill: #6b4f1d;
+    -fx-background-radius: 16;
+    -fx-padding: 2 14 2 14;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, #e0e0e0, 2, 0, 0, 1);
+}
+.pill-label.action-create {
+    -fx-background-color: #e6f9ee;
+    -fx-text-fill: #1a7f3c;
+}
+.pill-label.action-update {
+    -fx-background-color: #fffbe6;
+    -fx-text-fill: #bfa600;
+}
+.pill-label.action-delete {
+    -fx-background-color: #ffeaea;
+    -fx-text-fill: #c0392b;
+}
+
+/* Card style for filter area */
+.filter-card {
+    -fx-background-color: #fff;
+    -fx-background-radius: 16;
+    -fx-padding: 24 32 24 32;
+    -fx-effect: dropshadow(gaussian, #e0e0e0, 10, 0, 0, 2);
+}
+}

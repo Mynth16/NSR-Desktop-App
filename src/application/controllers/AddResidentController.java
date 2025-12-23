@@ -2,6 +2,8 @@ package application.controllers;
 
 
 import application.database.ResidentDAO;
+import application.database.AuditTrailDAO;
+import application.models.Account;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -10,6 +12,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class AddResidentController {
+    private Account currentAccount;
     @FXML private TextField firstNameField;
     @FXML private Label titleLabel;
     @FXML private TextField lastNameField;
@@ -75,6 +78,66 @@ public class AddResidentController {
         boolean success;
         if (residentToEdit != null) {
             // Update existing resident
+            // Only log changed fields
+            StringBuilder changes = new StringBuilder();
+            // Helper to clean null, "null", or whitespace to blank
+            java.util.function.Function<String, String> clean = s -> (s == null || s.trim().isEmpty() || "null".equalsIgnoreCase(s.trim())) ? "" : s.trim();
+
+            String beforeFirstName = clean.apply(residentToEdit.getName().split(" ", 2)[0]);
+            String afterFirstName = clean.apply(firstName);
+            if (!afterFirstName.equals(beforeFirstName)) {
+                changes.append("First Name: '").append(beforeFirstName).append("' -> '").append(afterFirstName).append("'\n");
+            }
+            String beforeLastName = clean.apply(residentToEdit.getName().split(" ", 2).length > 1 ? residentToEdit.getName().split(" ", 2)[1] : "");
+            String afterLastName = clean.apply(lastName);
+            if (!afterLastName.equals(beforeLastName)) {
+                changes.append("Last Name: '").append(beforeLastName).append("' -> '").append(afterLastName).append("'\n");
+            }
+            String beforeBirthDate = clean.apply(residentToEdit.getBirthDate());
+            String afterBirthDate = clean.apply(birthDateStr);
+            if (!afterBirthDate.equals(beforeBirthDate)) {
+                changes.append("Birth Date: '").append(beforeBirthDate).append("' -> '").append(afterBirthDate).append("'\n");
+            }
+            String beforeGender = clean.apply(residentToEdit.getGender());
+            String afterGender = clean.apply(gender);
+            if (!afterGender.equals(beforeGender)) {
+                changes.append("Gender: '").append(beforeGender).append("' -> '").append(afterGender).append("'\n");
+            }
+            String beforeCivilStatus = clean.apply(residentToEdit.getCivilStatus());
+            String afterCivilStatus = clean.apply(civilStatus);
+            if (!afterCivilStatus.equals(beforeCivilStatus)) {
+                changes.append("Civil Status: '").append(beforeCivilStatus).append("' -> '").append(afterCivilStatus).append("'\n");
+            }
+            String beforeHousehold = clean.apply(residentToEdit.getHousehold());
+            String afterHousehold = beforeHousehold;
+            if (selectedOption != null && !"No Household".equals(selectedOption.getDisplay())) {
+                afterHousehold = clean.apply(selectedOption.getDisplay());
+            } else if (selectedOption != null) {
+                afterHousehold = "No Household";
+            }
+            if (!afterHousehold.equals(beforeHousehold)) {
+                changes.append("Household: '").append(beforeHousehold).append("' -> '").append(afterHousehold).append("'\n");
+            }
+            String beforeContact = clean.apply(residentToEdit.getContact());
+            String afterContact = clean.apply(contact);
+            if (!afterContact.equals(beforeContact)) {
+                changes.append("Contact: '").append(beforeContact).append("' -> '").append(afterContact).append("'\n");
+            }
+            String beforeEdu = clean.apply(residentToEdit.getEducationalAttainment());
+            String afterEdu = clean.apply(educationalAttainment);
+            if (!afterEdu.equals(beforeEdu)) {
+                changes.append("Educational Attainment: '").append(beforeEdu).append("' -> '").append(afterEdu).append("'\n");
+            }
+            String beforeVoter = residentToEdit.isRegisteredVoter() ? "Yes" : "No";
+            String afterVoter = isVoter ? "Yes" : "No";
+            if (!afterVoter.equals(beforeVoter)) {
+                changes.append("Voter: '").append(beforeVoter).append("' -> '").append(afterVoter).append("'\n");
+            }
+            String beforePwd = residentToEdit.isPwd() ? "Yes" : "No";
+            String afterPwd = isPwd ? "Yes" : "No";
+            if (!afterPwd.equals(beforePwd)) {
+                changes.append("PWD: '").append(beforePwd).append("' -> '").append(afterPwd).append("'\n");
+            }
             success = dao.updateResident(
                 residentToEdit.getResidentId(),
                 firstName,
@@ -89,9 +152,12 @@ public class AddResidentController {
                 isVoter,
                 isPwd
             );
+            if (success && currentAccount != null && changes.length() > 0) {
+                AuditTrailDAO.logUpdate(currentAccount.getId(), "R", residentToEdit.getResidentId(), changes.toString().trim());
+            }
         } else {
             // Add new resident
-            success = dao.addResident(
+            String newResidentId = dao.addResident(
                 firstName,
                 lastName,
                 birthDateStr,
@@ -104,6 +170,11 @@ public class AddResidentController {
                 isVoter,
                 isPwd
             );
+            success = newResidentId != null;
+            if (success && currentAccount != null) {
+                String details = "Created resident: " + firstName + " " + lastName;
+                AuditTrailDAO.logCreate(currentAccount.getId(), "R", newResidentId, details);
+            }
         }
         if (success) {
             closeWindow();
@@ -111,6 +182,11 @@ public class AddResidentController {
             showAlert(residentToEdit != null ? "Failed to update resident. Please try again." : "Failed to add resident. Please try again.");
         }
     }
+
+    public void setCurrentAccount(Account account) {
+        this.currentAccount = account;
+    }
+
 
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

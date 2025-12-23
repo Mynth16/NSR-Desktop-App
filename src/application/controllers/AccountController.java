@@ -16,23 +16,14 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 
 public class AccountController extends NavigationBaseController {
-	@Override
-	public void setAccount(application.models.Account account) {
-		super.setAccount(account);
-		// Update UI if already initialized
-		if (addAccountBtn != null) {
-			addAccountBtn.setDisable(!isAdmin());
-			if (isStaff() || isViewer()) {
-				addAccountBtn.setTooltip(new Tooltip("Only Admins can add accounts."));
-			} else {
-				addAccountBtn.setTooltip(null);
-			}
-		}
-		// Optionally refresh table to update action buttons
-		if (accountTable != null) {
-			accountTable.refresh();
-		}
-	}
+	@FXML
+	private Label sidebarNameLabel;
+	@FXML
+	private Label sidebarRoleLabel;
+	@FXML
+	private Label sidebarUsernameLabel;
+
+	// (Removed duplicate setAccount method)
 	@FXML private TableView<Account> accountTable;
 	@FXML private TableColumn<Account, String> usernameCol;
 	@FXML private TableColumn<Account, String> roleCol;
@@ -71,8 +62,40 @@ public class AccountController extends NavigationBaseController {
 	@FXML
 	public void initialize() {
 		bindNavigationHandlers();
+	}
+
+	@Override
+	public void setAccount(application.models.Account account) {
+		super.setAccount(account);
+		if (account != null) {
+			if (sidebarNameLabel != null) {
+				sidebarNameLabel.setText(account.getUsername());
+			}
+			if (sidebarUsernameLabel != null) {
+				sidebarUsernameLabel.setText(account.getUsername());
+			}
+			if (sidebarRoleLabel != null) {
+				String role = account.getRole();
+				String display;
+				if (role == null) display = "Viewer";
+				else if (role.equalsIgnoreCase("A") || role.equalsIgnoreCase("Admin")) display = "Admin";
+				else if (role.equalsIgnoreCase("S") || role.equalsIgnoreCase("Staff")) display = "Staff";
+				else if (role.equalsIgnoreCase("V") || role.equalsIgnoreCase("Viewer")) display = "Viewer";
+				else display = role;
+				sidebarRoleLabel.setText(display);
+			}
+		}
 		usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
-		roleCol.setCellValueFactory(new PropertyValueFactory<>("role"));
+		roleCol.setCellValueFactory(cellData -> {
+			String role = cellData.getValue().getRole();
+			String display;
+			if (role == null) display = "Viewer";
+			else if (role.equalsIgnoreCase("A") || role.equalsIgnoreCase("Admin")) display = "Admin";
+			else if (role.equalsIgnoreCase("S") || role.equalsIgnoreCase("Staff")) display = "Staff";
+			else if (role.equalsIgnoreCase("V") || role.equalsIgnoreCase("Viewer")) display = "Viewer";
+			else display = role;
+			return new javafx.beans.property.SimpleStringProperty(display);
+		});
 		createdCol.setCellValueFactory(new PropertyValueFactory<>("created"));
 		addActionsColumn();
 		loadAccounts();
@@ -94,14 +117,14 @@ public class AccountController extends NavigationBaseController {
 			@Override
 			public TableCell<Account, Void> call(final TableColumn<Account, Void> param) {
 				return new TableCell<Account, Void>() {
-					private final Button editBtn = new Button("Edit");
-					private final Button deleteBtn = new Button("Delete");
-					{
-						editBtn.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-text-fill: #28a745;");
-						deleteBtn.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-text-fill: #dc3545;");
-						editBtn.setOnAction(e -> onEditAccount(getTableView().getItems().get(getIndex())));
-						deleteBtn.setOnAction(e -> deleteAccount(getTableView().getItems().get(getIndex())));
-					}
+					   private final Button editBtn = new Button("Edit");
+					   private final Button deleteBtn = new Button("Delete");
+					   {
+						   editBtn.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;");
+						   deleteBtn.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;");
+						   editBtn.setOnAction(e -> onEditAccount(getTableView().getItems().get(getIndex())));
+						   deleteBtn.setOnAction(e -> deleteAccount(getTableView().getItems().get(getIndex())));
+					   }
 					@Override
 					public void updateItem(Void item, boolean empty) {
 						super.updateItem(item, empty);
@@ -132,6 +155,11 @@ public class AccountController extends NavigationBaseController {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/application/views/add_account.fxml"));
 			Parent root = loader.load();
+			// Pass currentAccount to AddAccountController
+			Object controller = loader.getController();
+			if (controller instanceof application.controllers.AddAccountController && this.currentAccount != null) {
+				((application.controllers.AddAccountController) controller).setAccount(this.currentAccount);
+			}
 			Stage stage = new Stage();
 			stage.setTitle("Add New Account");
 			stage.setScene(new Scene(root));
@@ -177,6 +205,11 @@ public class AccountController extends NavigationBaseController {
 				String currentUserRole = (this.currentAccount != null && this.currentAccount.getRole() != null) ? this.currentAccount.getRole() : "Viewer";
 				boolean success = accountDAO.deleteAccount(id, currentUserRole);
 				if (success) {
+					// Audit log
+					if (this.currentAccount != null) {
+						String userId = this.currentAccount.getId();
+						application.database.AuditTrailDAO.logDelete(userId, "A", id, "Deleted account: " + account.getUsername());
+					}
 					loadAccounts();
 				} else {
 					Alert error = new Alert(Alert.AlertType.ERROR, "Failed to delete account. You may lack permission.", ButtonType.OK);

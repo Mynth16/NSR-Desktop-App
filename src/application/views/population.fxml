@@ -104,7 +104,7 @@
                         </image>
                     </ImageView>
                     <VBox>
-                        <Label text="admin" textFill="white">
+                        <Label fx:id="sidebarUsernameLabel" text="admin" textFill="white">
                             <font>
                                 <Font name="System Bold" size="12"/>
                             </font>
