@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="application.controllers.AddHouseholdController" prefWidth="400" prefHeight="250">
+    <children>
+        <VBox alignment="TOP_CENTER" spacing="18" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" style="-fx-background-color: linear-gradient(to bottom right, #f8f9fa, #e9ecef); -fx-padding: 24;">
+            <Label text="Add New Household" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #226622;"/>
+            <VBox spacing="10" style="-fx-padding: 0 0 0 0;">
+                <Label text="Zone Number *" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <TextField fx:id="zoneNumberField" promptText="Enter zone number"/>
+                <Label text="House Number *" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <TextField fx:id="houseNumberField" promptText="Enter house number"/>
+            </VBox>
+            <HBox spacing="12" alignment="CENTER_RIGHT">
+                <Button fx:id="cancelBtn" text="Cancel" minWidth="80" style="-fx-background-color: #f8f9fa; -fx-text-fill: #444; -fx-border-color: #bbb; -fx-border-radius: 5;"/>
+                <Button fx:id="saveBtn" text="Save" minWidth="80" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5;"/>
+            </HBox>
+        </VBox>
+    </children>
+</AnchorPane>

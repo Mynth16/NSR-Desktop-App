@@ -1,60 +1,16 @@
-
 package application.controllers;
-
-
-
-import application.models.Account;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.stage.Stage;
 
 import application.database.HouseholdDAO;
 import application.database.ResidentDAO;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.Button;
+import javafx.scene.control.ProgressBar;
 import java.util.Map;
 
+// EXTEND the base controller
+public class DashboardController extends NavigationBaseController {
 
-
-public class DashboardController {
-    @FXML private Label sidebarNameLabel;
-    @FXML private Label sidebarRoleLabel;
-
-        private Account currentAccount;
-
-        public void setAccount(Account account) {
-            this.currentAccount = account;
-            if (sidebarNameLabel != null && sidebarRoleLabel != null && account != null) {
-                sidebarNameLabel.setText(account.getUsername() != null ? account.getUsername() : "User");
-                String role = account.getRole();
-                String displayRole;
-                if (role == null) {
-                    displayRole = "Viewer";
-                } else {
-                    switch (role) {
-                        case "A": displayRole = "Admin"; break;
-                        case "S": displayRole = "Staff"; break;
-                        case "V": displayRole = "Viewer"; break;
-                        default: displayRole = role;
-                    }
-                }
-                sidebarRoleLabel.setText(displayRole);
-            }
-        }
-    @FXML private Button dashboardBtn;
-    @FXML private Button populationBtn;
-    @FXML private Button householdsBtn;
-    @FXML private Button accountBtn;
-    @FXML private Button auditBtn;
-    @FXML private Button logoutBtn;
-
-    // Dashboard statistic labels (add fx:id to FXML for these)
+    // --- Dashboard Specific Labels ---
     @FXML private Label totalPopulationLabel;
     @FXML private Label totalHouseholdsLabel;
     @FXML private Label maleCountLabel;
@@ -62,7 +18,6 @@ public class DashboardController {
     @FXML private Label voterCountLabel;
     @FXML private Label pwdCountLabel;
 
-    // Zone and age distribution labels (add fx:id to FXML for these)
     @FXML private Label zone1HouseholdsLabel;
     @FXML private Label zone1PeopleLabel;
     @FXML private Label zone2HouseholdsLabel;
@@ -80,114 +35,32 @@ public class DashboardController {
     @FXML private Label middleAgedCountLabel;
     @FXML private Label seniorCountLabel;
 
-    @FXML private javafx.scene.control.ProgressBar minorProgressBar;
-    @FXML private javafx.scene.control.ProgressBar youngAdultProgressBar;
-    @FXML private javafx.scene.control.ProgressBar adultProgressBar;
-    @FXML private javafx.scene.control.ProgressBar middleAgedProgressBar;
-    @FXML private javafx.scene.control.ProgressBar seniorProgressBar;
+    @FXML private ProgressBar minorProgressBar;
+    @FXML private ProgressBar youngAdultProgressBar;
+    @FXML private ProgressBar adultProgressBar;
+    @FXML private ProgressBar middleAgedProgressBar;
+    @FXML private ProgressBar seniorProgressBar;
 
     private ResidentDAO residentDAO = new ResidentDAO();
     private HouseholdDAO householdDAO = new HouseholdDAO();
 
     @FXML
     private void initialize() {
-        dashboardBtn.setOnAction(e -> navigateToDashboard());
-        populationBtn.setOnAction(e -> navigateToPopulation());
-        householdsBtn.setOnAction(e -> navigateToHouseholds());
-        accountBtn.setOnAction(e -> navigateToAccounts());
-        auditBtn.setOnAction(e -> navigateToAuditTrail());
-        logoutBtn.setOnAction(e -> handleLogout());
+        // 1. Setup Navigation & Sidebar (Inherited)
+        bindNavigationHandlers();
 
+        // 2. Load Data (Specific to Dashboard)
         loadDashboardStats();
     }
 
-    private void navigateToDashboard() {
-        // Already on dashboard
+    @Override
+    protected void navigateToDashboard() {
+        // We are already here, so do nothing (prevents reload)
         System.out.println("Already on Dashboard");
     }
 
-    private void navigateToPopulation() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/application/views/population.fxml"));
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
-            Stage stage = (Stage) dashboardBtn.getScene().getWindow();
-            stage.setScene(scene);
-        } catch (Exception e) {
-            e.printStackTrace();
-            showError("Population module not yet implemented.");
-        }
-    }
+    // For login integration: allow passing account info
 
-    private void navigateToHouseholds() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/application/views/households.fxml"));
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
-            Stage stage = (Stage) dashboardBtn.getScene().getWindow();
-            stage.setScene(scene);
-        } catch (Exception e) {
-            e.printStackTrace();
-            showError("Households module not yet implemented.");
-        }
-    }
-
-    private void navigateToAccounts() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/application/views/accounts.fxml"));
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
-            Stage stage = (Stage) dashboardBtn.getScene().getWindow();
-            stage.setScene(scene);
-        } catch (Exception e) {
-            e.printStackTrace();
-            showError("Accounts module not yet implemented.");
-        }
-    }
-
-    private void navigateToAuditTrail() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/application/views/audittrail.fxml"));
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
-            Stage stage = (Stage) dashboardBtn.getScene().getWindow();
-            stage.setScene(scene);
-        } catch (Exception e) {
-            e.printStackTrace();
-            showError("Audit Trail module not yet implemented.");
-        }
-    }
-
-    private void handleLogout() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Logout");
-        alert.setHeaderText(null);
-        alert.setContentText("Are you sure you want to logout?");
-
-        alert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/application/views/login.fxml"));
-                    Parent root = loader.load();
-                    Scene scene = new Scene(root);
-                    Stage stage = (Stage) logoutBtn.getScene().getWindow();
-                    stage.setScene(scene);
-                    stage.setMaximized(false);
-                    stage.setResizable(false);
-                    stage.centerOnScreen();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    showError("Failed to logout: " + e.getMessage());
-                }
-            }
-        });
-    }
-
-    private void showError(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR, message);
-        alert.setHeaderText(null);
-        alert.showAndWait();
-    }
 
     private void loadDashboardStats() {
         // Population and households
@@ -240,12 +113,4 @@ public class DashboardController {
         middleAgedProgressBar.setProgress(total > 0 ? (double) middleAged / total : 0);
         seniorProgressBar.setProgress(total > 0 ? (double) senior / total : 0);
     }
-
-    private String percentString(int count, int total) {
-        if (total == 0) return "(0%)";
-        double percent = (double) count / total * 100.0;
-        return String.format("(%1.1f%%)", percent);
-    }
-
-    // ...existing navigation and error handling code...
 }

@@ -1,0 +1,75 @@
+/* 1. Add spacing inside the table cells */
+.table-cell {
+    -fx-padding: 0 5px 0 5px; /* Top Right Bottom Left */
+    -fx-alignment: CENTER_LEFT; /* Keeps text aligned properly */
+}
+
+/* 2. (Optional) Add the same spacing to headers so they match the data */
+.table-view .column-header .label {
+    -fx-padding: 0 5px 0 5px;
+}
+
+/* Sidebar styles */
+.sidebar-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #fff;
+    -fx-font-size: 16px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 12 24 12 24;
+    -fx-cursor: hand;
+}
+.sidebar-btn:hover {
+    -fx-background-color: #1e5c34;
+}
+.sidebar-btn-active {
+    -fx-background-color: #fff2;
+    -fx-font-weight: bold;
+}
+.logout-btn {
+    -fx-background-color: #c0392b;
+    -fx-text-fill: #fff;
+    -fx-font-size: 16px;
+    -fx-padding: 10 0 10 0;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-max-width: 180;
+    -fx-min-width: 180;
+    -fx-alignment: CENTER;
+    -fx-margin: 0 0 24 0;
+}
+.logout-btn:hover {
+    -fx-background-color: #e74c3c;
+}
+
+/* Add Household Button */
+.add-household-btn {
+    -fx-background-color: #1e5c34;
+    -fx-text-fill: #fff;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 24 10 24;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.add-household-btn:hover {
+    -fx-background-color: #20522a;
+}
+
+/* Search Bar */
+.search-bar {
+    -fx-background-radius: 20;
+    -fx-background-color: #fff;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 20;
+    -fx-padding: 10 20 10 20;
+    -fx-font-size: 16px;
+    -fx-min-width: 400;
+}
+
+/* Table Styles */
+.household-table {
+    -fx-background-radius: 20;
+    -fx-background-color: #fff;
+    -fx-padding: 0 32 32 32;
+    -fx-effect: dropshadow(gaussian, #e0e0e0, 10, 0, 0, 2);
+}

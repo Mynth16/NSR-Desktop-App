@@ -1,14 +1,186 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="application.views.Population"
-            prefHeight="400.0" prefWidth="600.0">
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.util.Callback?>
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="application.controllers.ResidentController"
+            style="-fx-background-color: #f5f5f0;"
+            minWidth="1200" minHeight="700" maxWidth="1200" maxHeight="700">
 
-</AnchorPane>
+    <!-- Left Sidebar -->
+    <left>
+        <VBox prefWidth="200.0" style="-fx-background-color: #1a4d2e;" spacing="0">
+
+            <!-- Logo and Admin Info -->
+            <VBox alignment="CENTER" spacing="8" style="-fx-background-color: #0d3320;">
+                <padding>
+                    <Insets top="20" bottom="20" left="15" right="15"/>
+                </padding>
+
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <ImageView fitWidth="40" fitHeight="40" preserveRatio="true">
+                        <image>
+                            <Image url="@/application/assets/NSRLogo.png" />
+                        </image>
+                    </ImageView>
+                    <VBox>
+                        <Label fx:id="sidebarNameLabel" text="NSR Admin" textFill="white">
+                            <font>
+                                <Font name="System Bold" size="14"/>
+                            </font>
+                        </Label>
+                        <Label fx:id="sidebarRoleLabel" text="Admin" textFill="#b8b8b8">
+                            <font>
+                                <Font size="11"/>
+                            </font>
+                        </Label>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- Navigation Menu -->
+            <VBox spacing="5" VBox.vgrow="ALWAYS">
+                <padding>
+                    <Insets top="20" bottom="20" left="10" right="10"/>
+                </padding>
+
+                <Button fx:id="dashboardBtn" text="📊  Dashboard" maxWidth="Infinity" alignment="CENTER_LEFT"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px;">
+                    <padding>
+                        <Insets top="12" bottom="12" left="15" right="15"/>
+                    </padding>
+                </Button>
+
+                <Button fx:id="populationBtn" text="👥  Population" maxWidth="Infinity" alignment="CENTER_LEFT"
+                        style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px; -fx-font-weight: normal;">
+                    <padding>
+                        <Insets top="12" bottom="12" left="15" right="15"/>
+                    </padding>
+                </Button>
+
+                <Button fx:id="householdsBtn" text="🏠  Households" maxWidth="Infinity" alignment="CENTER_LEFT"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px;">
+                    <padding>
+                        <Insets top="12" bottom="12" left="15" right="15"/>
+                    </padding>
+                </Button>
+
+                <Button fx:id="accountBtn" text="👤  Account Management" maxWidth="Infinity" alignment="CENTER_LEFT"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px;">
+                    <padding>
+                        <Insets top="12" bottom="12" left="15" right="15"/>
+                    </padding>
+                </Button>
+
+                <Button fx:id="auditBtn" text="🔄  Audit Trail" maxWidth="Infinity" alignment="CENTER_LEFT"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px;">
+                    <padding>
+                        <Insets top="12" bottom="12" left="15" right="15"/>
+                    </padding>
+                </Button>
+
+                <Region VBox.vgrow="ALWAYS"/>
+            </VBox>
+
+            <!-- Bottom User Info and Logout -->
+            <VBox spacing="10">
+                <padding>
+                    <Insets top="10" bottom="20" left="10" right="10"/>
+                </padding>
+
+                <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #0d3320; -fx-background-radius: 8;">
+                    <padding>
+                        <Insets top="10" bottom="10" left="10" right="10"/>
+                    </padding>
+                    <ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
+                        <image>
+                            <Image url="@/application/assets/user.png" />
+                        </image>
+                    </ImageView>
+                    <VBox>
+                        <Label text="admin" textFill="white">
+                            <font>
+                                <Font name="System Bold" size="12"/>
+                            </font>
+                        </Label>
+                        <Label text="Online" textFill="#4ade80">
+                            <font>
+                                <Font size="10"/>
+                            </font>
+                        </Label>
+                    </VBox>
+                </HBox>
+
+                <Button fx:id="logoutBtn" text="🚪  Logout" maxWidth="Infinity"
+                        style="-fx-background-color: #dc3545; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px; -fx-font-weight: bold;">
+                    <padding>
+                        <Insets top="12" bottom="12" left="15" right="15"/>
+                    </padding>
+                </Button>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- Main Content Area -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
+        <VBox spacing="20" style="-fx-font-size: 20px;">
+            <padding><Insets top="20" bottom="20" left="30" right="30"/></padding>
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="20">
+                <Label text="Population Management" textFill="#2d5016">
+                    <font><Font name="System Bold" size="40"/></font>
+                </Label>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="addResidentBtn" text="Add Resident" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 22px; -fx-background-radius: 8; -fx-cursor: hand;">
+                    <graphic>
+                        <Label text="👤" style="-fx-font-size: 22px;"/>
+                    </graphic>
+                </Button>
+            </HBox>
+            <Label text="Manage residents and their information" textFill="#8b7355">
+                <font><Font size="22"/></font>
+            </Label>
+            <!-- Filters -->
+            <HBox spacing="14" alignment="CENTER_LEFT" style="-fx-background-color: #f8f8f8; -fx-background-radius: 8; -fx-font-size: 20px;">
+                <TextField fx:id="searchField" promptText="Search by name..." style="-fx-background-radius: 8; -fx-font-size: 20px;"/>
+                <ComboBox fx:id="genderFilter" promptText="All Genders" style="-fx-font-size: 20px;"/>
+                <TextField fx:id="minAgeField" promptText="Min Age" style="-fx-background-radius: 8; -fx-font-size: 20px;" maxWidth="90"/>
+                <TextField fx:id="maxAgeField" promptText="Max Age" style="-fx-background-radius: 8; -fx-font-size: 20px;" maxWidth="90"/>
+                <ComboBox fx:id="zoneFilter" promptText="All Zones" style="-fx-font-size: 20px;"/>
+                <ComboBox fx:id="civilStatusFilter" promptText="All Status" style="-fx-font-size: 20px;"/>
+                <ComboBox fx:id="voterFilter" promptText="Registered Voter" style="-fx-font-size: 20px;"/>
+                <ComboBox fx:id="pwdFilter" promptText="Not PWD" style="-fx-font-size: 20px;"/>
+                <Button fx:id="clearFiltersBtn" text="Clear" style="-fx-background-color: #f5e6d6; -fx-text-fill: #333; -fx-background-radius: 8; -fx-font-size: 20px;"/>
+            </HBox>
+            <!-- Residents Table -->
+            <TableView fx:id="residentTable" VBox.vgrow="ALWAYS" style="-fx-background-radius: 12; -fx-font-size: 20px;" prefHeight="900">
+
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                </columnResizePolicy>
+
+                <columns>
+                    <TableColumn text="Name" fx:id="nameCol" prefWidth="180" minWidth="120" maxWidth="400"/>
+                    <TableColumn text="Age" fx:id="ageCol" prefWidth="70" minWidth="50" maxWidth="100"/>
+                    <TableColumn text="Gender" fx:id="genderCol" prefWidth="90" minWidth="70" maxWidth="120"/>
+                    <TableColumn text="Civil Status" fx:id="civilStatusCol" prefWidth="120" minWidth="90" maxWidth="180"/>
+                    <TableColumn text="Household" fx:id="householdCol" prefWidth="160" minWidth="120" maxWidth="300"/>
+                    <TableColumn text="Contact" fx:id="contactCol" prefWidth="130" minWidth="100" maxWidth="200"/>
+                    <TableColumn text="Birth Date" fx:id="birthDateCol" prefWidth="120" minWidth="100" maxWidth="180"/>
+                    <TableColumn text="Educational Attainment" fx:id="educationalAttainmentCol" prefWidth="180" minWidth="120" maxWidth="250"/>
+                    <TableColumn text="Registered Voter" fx:id="registeredVoterCol" prefWidth="140" minWidth="100" maxWidth="180"/>
+                    <TableColumn text="Actions" fx:id="actionsCol" prefWidth="180" minWidth="120" maxWidth="250">
+                    </TableColumn>
+                </columns>
+            </TableView>
+        </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

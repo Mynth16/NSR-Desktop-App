@@ -9,7 +9,7 @@ import java.sql.*;
 
 public class AccountDAO {
     public Account login(String username, String password) {
-        String sql = "SELECT username, password, role FROM account WHERE username = ?";
+        String sql = "SELECT acc_id, username, password, role, created_at FROM account WHERE username = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -37,9 +37,11 @@ public class AccountDAO {
                     // Verify password using BCrypt
                     if (BCrypt.checkpw(password, compatibleHash)) {
                         return new Account(
+                                rs.getString("acc_id"),
                                 rs.getString("username"),
                                 hashedPassword,
-                                rs.getString("role")
+                                rs.getString("role"),
+                                rs.getString("created_at")
                         );
                     }
                 } catch (IllegalArgumentException e) {
@@ -61,7 +63,7 @@ public class AccountDAO {
 
     public ObservableList<Account> getAllAccounts() {
         ObservableList<Account> list = FXCollections.observableArrayList();
-        String sql = "SELECT * FROM account ORDER BY id ASC";
+        String sql = "SELECT acc_id, username, password, role, created_at FROM account ORDER BY username ASC";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -69,9 +71,11 @@ public class AccountDAO {
 
             while (rs.next()) {
                 list.add(new Account(
+                        rs.getString("acc_id"),
                         rs.getString("username"),
                         rs.getString("password"),
-                        rs.getString("role")
+                        rs.getString("role"),
+                        rs.getString("created_at")
                 ));
             }
 
@@ -83,76 +87,89 @@ public class AccountDAO {
         return list;
     }
 
-    public boolean addAccount(String username, String password, String role) {
+    // Only Admins can add accounts
+    public boolean addAccount(String username, String password, String role, String currentUserRole) {
+        if (!"Admin".equalsIgnoreCase(currentUserRole) && !"A".equalsIgnoreCase(currentUserRole)) {
+            System.err.println("Permission denied: Only Admins can add accounts.");
+            return false;
+        }
         String sql = "INSERT INTO account (username, password, role) VALUES (?, ?, ?)";
-
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            // Hash the password before storing
             String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt(12));
-
             stmt.setString(1, username);
             stmt.setString(2, hashedPassword);
             stmt.setString(3, role);
-
             return stmt.executeUpdate() > 0;
-
         } catch (SQLException e) {
             System.err.println("Failed to add Account");
             e.printStackTrace();
         }
-
         return false;
     }
 
-    public boolean updateAccount(int id, String username, String role, String newPasswordOrNull) {
+    // Only Admins can update accounts
+    public boolean updateAccount(String id, String username, String role, String newPasswordOrNull, String currentUserRole) {
+        if (!"Admin".equalsIgnoreCase(currentUserRole) && !"A".equalsIgnoreCase(currentUserRole)) {
+            System.err.println("Permission denied: Only Admins can update accounts.");
+            return false;
+        }
         boolean updatePassword = newPasswordOrNull != null && !newPasswordOrNull.isEmpty();
-
         String sql = updatePassword
-                ? "UPDATE account SET username=?, role=?, password=? WHERE id=?"
-                : "UPDATE account SET username=?, role=? WHERE id=?";
-
+            ? "UPDATE account SET username=?, role=?, password=? WHERE acc_id=?"
+            : "UPDATE account SET username=?, role=? WHERE acc_id=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
             stmt.setString(1, username);
             stmt.setString(2, role);
-
             if (updatePassword) {
-                // Hash the new password before storing
                 String hashedPassword = BCrypt.hashpw(newPasswordOrNull, BCrypt.gensalt(12));
                 stmt.setString(3, hashedPassword);
-                stmt.setInt(4, id);
+                stmt.setString(4, id);
             } else {
-                stmt.setInt(3, id);
+                stmt.setString(3, id);
             }
-
             return stmt.executeUpdate() > 0;
-
         } catch (SQLException e) {
             System.err.println("Failed to update Account");
             e.printStackTrace();
         }
-
         return false;
     }
 
-    public boolean deleteAccount(int id) {
-        String sql = "DELETE FROM account WHERE id=?";
-
+    // Only Admins can delete accounts
+    public boolean deleteAccount(String id, String currentUserRole) {
+        if (!"Admin".equalsIgnoreCase(currentUserRole) && !"A".equalsIgnoreCase(currentUserRole)) {
+            System.err.println("Permission denied: Only Admins can delete accounts.");
+            return false;
+        }
+        String sql = "DELETE FROM account WHERE acc_id=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
+            stmt.setString(1, id);
             return stmt.executeUpdate() > 0;
-
         } catch (SQLException e) {
             System.err.println("Failed to delete account");
             e.printStackTrace();
         }
-
         return false;
+    }
+
+    // Get account id by username (for edit/delete)
+    public String getAccountIdByUsername(String username) {
+        String sql = "SELECT acc_id FROM account WHERE username = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("acc_id");
+            }
+        } catch (SQLException e) {
+            System.err.println("Failed to get account id by username");
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

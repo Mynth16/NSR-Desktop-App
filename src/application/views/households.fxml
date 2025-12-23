@@ -1,14 +1,158 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.geometry.Insets?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="application.views.Households"
-            prefHeight="400.0" prefWidth="600.0">
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.text.Font?>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="application.controllers.HouseholdController" prefHeight="800.0" prefWidth="1400.0">
+    <!-- Left Sidebar -->
+    <left>
+        <VBox prefWidth="200.0" style="-fx-background-color: #1a4d2e;" spacing="0">
 
-</AnchorPane>
+            <!-- Logo and Admin Info -->
+            <VBox alignment="CENTER" spacing="8" style="-fx-background-color: #0d3320;">
+                <padding>
+                    <Insets top="20" bottom="20" left="15" right="15"/>
+                </padding>
+
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <ImageView fitWidth="40" fitHeight="40" preserveRatio="true">
+                        <image>
+                            <Image url="@/application/assets/NSRLogo.png" />
+                        </image>
+                    </ImageView>
+                    <VBox>
+                        <Label fx:id="sidebarNameLabel" text="NSR Admin" textFill="white">
+                            <font>
+                                <Font name="System Bold" size="14"/>
+                            </font>
+                        </Label>
+                        <Label fx:id="sidebarRoleLabel" text="Admin" textFill="#b8b8b8">
+                            <font>
+                                <Font size="11"/>
+                            </font>
+                        </Label>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- Navigation Menu -->
+            <VBox spacing="5" VBox.vgrow="ALWAYS">
+                <padding>
+                    <Insets top="20" bottom="20" left="10" right="10"/>
+                </padding>
+
+                <Button fx:id="dashboardBtn" text="📊  Dashboard" maxWidth="Infinity" alignment="CENTER_LEFT"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px;">
+                    <padding>
+                        <Insets top="12" bottom="12" left="15" right="15"/>
+                    </padding>
+                </Button>
+
+                <Button fx:id="populationBtn" text="👥  Population" maxWidth="Infinity" alignment="CENTER_LEFT"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px;">
+                    <padding>
+                        <Insets top="12" bottom="12" left="15" right="15"/>
+                    </padding>
+                </Button>
+
+                <Button fx:id="householdsBtn" text="🏠  Households" maxWidth="Infinity" alignment="CENTER_LEFT"
+                        style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px; -fx-font-weight: normal;">
+                    <padding>
+                        <Insets top="12" bottom="12" left="15" right="15"/>
+                    </padding>
+                </Button>
+
+                <Button fx:id="accountBtn" text="👤  Account Management" maxWidth="Infinity" alignment="CENTER_LEFT"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px;">
+                    <padding>
+                        <Insets top="12" bottom="12" left="15" right="15"/>
+                    </padding>
+                </Button>
+
+                <Button fx:id="auditBtn" text="🔄  Audit Trail" maxWidth="Infinity" alignment="CENTER_LEFT"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px;">
+                    <padding>
+                        <Insets top="12" bottom="12" left="15" right="15"/>
+                    </padding>
+                </Button>
+
+                <Region VBox.vgrow="ALWAYS"/>
+            </VBox>
+
+            <!-- Bottom User Info and Logout -->
+            <VBox spacing="10">
+                <padding>
+                    <Insets top="10" bottom="20" left="10" right="10"/>
+                </padding>
+
+                <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #0d3320; -fx-background-radius: 8;">
+                    <padding>
+                        <Insets top="10" bottom="10" left="10" right="10"/>
+                    </padding>
+                    <ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
+                        <image>
+                            <Image url="@/application/assets/user.png" />
+                        </image>
+                    </ImageView>
+                    <VBox>
+                        <Label text="admin" textFill="white">
+                            <font>
+                                <Font name="System Bold" size="12"/>
+                            </font>
+                        </Label>
+                        <Label text="Online" textFill="#4ade80">
+                            <font>
+                                <Font size="10"/>
+                            </font>
+                        </Label>
+                    </VBox>
+                </HBox>
+
+                <Button fx:id="logoutBtn" text="🚪  Logout" maxWidth="Infinity"
+                        style="-fx-background-color: #dc3545; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px; -fx-font-weight: bold;">
+                    <padding>
+                        <Insets top="12" bottom="12" left="15" right="15"/>
+                    </padding>
+                </Button>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="16" style="-fx-background-color: #faf6f2; -fx-padding: 0 0 0 0;">
+            <!-- Header -->
+            <VBox style="-fx-padding: 32 0 0 32;">
+                <Label text="Household Management" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #20522a;"/>
+                <Label text="Manage households and their residents" style="-fx-font-size: 14px; -fx-text-fill: #888; -fx-padding: 4 0 0 0;"/>
+            </VBox>
+
+            <!-- Search and Add Button -->
+            <HBox alignment="CENTER_LEFT" spacing="16" style="-fx-padding: 0 32 0 32;">
+                <TextField fx:id="searchField" promptText="Search by house or zone number..." styleClass="search-bar" style="-fx-background-radius: 8; -fx-font-size: 20px;" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button fx:id="addHouseholdBtn" text="Add Household" onAction="#openAddHouseholdModal" styleClass="add-household-btn" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 22px; -fx-background-radius: 8; -fx-cursor: hand;"/>
+            </HBox>
+
+            <!-- Table -->
+            <TableView fx:id="householdTable" VBox.vgrow="ALWAYS" style="-fx-background-radius: 12; -fx-font-size: 20px;" prefHeight="900">
+
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                </columnResizePolicy>
+
+                <columns>
+                    <TableColumn text="ZONE" fx:id="zoneCol" />
+                    <TableColumn text="HOUSE NUMBER" fx:id="houseNumberCol" />
+                    <TableColumn text="HEAD OF HOUSEHOLD" fx:id="headCol" />
+                    <TableColumn text="RESIDENTS" fx:id="residentsCol" />
+                    <TableColumn text="STATUS" fx:id="statusCol" />
+                    <TableColumn text="ACTIONS" fx:id="actionsCol" />
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+</BorderPane>

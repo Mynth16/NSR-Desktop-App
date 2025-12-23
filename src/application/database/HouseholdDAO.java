@@ -7,6 +7,10 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.util.ArrayList;
+import java.util.List;
+import application.models.Household;
+
 public class HouseholdDAO {
 	public int getTotalHouseholds() {
 		String sql = "SELECT COUNT(*) FROM households";
@@ -35,5 +39,87 @@ public class HouseholdDAO {
 			e.printStackTrace();
 		}
 		return zoneMap;
+	}
+	/**
+	 * Returns a list of all households with zone, house number, head of household, resident count, and status.
+	 */
+	public List<Household> getAllHouseholds() {
+		List<Household> list = new ArrayList<>();
+		String sql = "SELECT h.zone_num, h.house_num, " +
+				"CONCAT(r.first_name, ' ', r.last_name) AS head_name, " +
+				"(SELECT COUNT(*) FROM residents r2 WHERE r2.household_id = h.household_id AND r2.status <> 'X') as residents_count, " +
+				"CASE WHEN h.status = 'A' THEN 'Active' ELSE 'Inactive' END as status " +
+				"FROM households h " +
+				"LEFT JOIN residents r ON h.head_resident_id = r.resident_id";
+		try (Connection conn = DBConnection.getConnection();
+			 PreparedStatement stmt = conn.prepareStatement(sql);
+			 ResultSet rs = stmt.executeQuery()) {
+			while (rs.next()) {
+				list.add(new Household(
+						"Zone " + rs.getString("zone_num"),
+						rs.getString("house_num"),
+						rs.getString("head_name") != null ? rs.getString("head_name") : "-",
+						rs.getInt("residents_count"),
+						rs.getString("status")
+				));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
+
+	/**
+	 * Returns a list of HouseholdOption objects for ComboBox population.
+	 */
+	public List<HouseholdOption> getHouseholdOptions() {
+		List<HouseholdOption> list = new ArrayList<>();
+		String sql = "SELECT household_id, zone_num, house_num FROM households ORDER BY zone_num, house_num";
+		try (Connection conn = DBConnection.getConnection();
+			 PreparedStatement stmt = conn.prepareStatement(sql);
+			 ResultSet rs = stmt.executeQuery()) {
+			while (rs.next()) {
+				String display = "Zone " + rs.getString("zone_num") + " - " + rs.getString("house_num");
+				String id = rs.getString("household_id");
+				list.add(new HouseholdOption(id, display));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
+
+	public static class HouseholdOption {
+		private final String id;
+		private final String display;
+		public HouseholdOption(String id, String display) {
+			this.id = id;
+			this.display = display;
+		}
+		public String getId() { return id; }
+		public String getDisplay() { return display; }
+		@Override
+		public String toString() { return display; }
+	}
+	/**
+	 * Adds a new household to the database. Only zone and house number are required.
+	 */
+	public boolean addHousehold(Household household) {
+		String sql = "INSERT INTO households (zone_num, house_num, status) VALUES (?, ?, 'A')";
+		try (Connection conn = DBConnection.getConnection();
+			 PreparedStatement stmt = conn.prepareStatement(sql)) {
+			// Remove 'Zone ' prefix if present
+			String zone = household.getZone();
+			if (zone.toLowerCase().startsWith("zone ")) {
+				zone = zone.substring(5).trim();
+			}
+			stmt.setString(1, zone);
+			stmt.setString(2, household.getHouseNumber());
+			int affected = stmt.executeUpdate();
+			return affected > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 }
