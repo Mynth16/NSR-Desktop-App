@@ -56,27 +56,6 @@ public class ResidentController extends NavigationBaseController {
 	private ResidentDAO residentDAO = new ResidentDAO();
 
 	@FXML
-	private void openAddResidentModal() {
-		if (isViewer()) return;
-		try {
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("/application/views/add_resident.fxml"));
-			Parent root = loader.load();
-			application.controllers.AddResidentController controller = loader.getController();
-			if (this.currentAccount != null) {
-				controller.setCurrentAccount(this.currentAccount);
-			}
-			Stage stage = new Stage();
-			stage.setTitle("Add New Resident");
-			stage.setScene(new Scene(root));
-			stage.setResizable(false);
-			stage.showAndWait();
-			loadResidents();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	@FXML
 	public void initialize() {
 		bindNavigationHandlers();
 	}
@@ -233,6 +212,28 @@ public class ResidentController extends NavigationBaseController {
 				}
 			});
 		}
+
+
+	@FXML
+	private void openAddResidentModal() {
+		if (isViewer()) return;
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/application/views/add_resident.fxml"));
+			Parent root = loader.load();
+			application.controllers.AddResidentController controller = loader.getController();
+			if (this.currentAccount != null) {
+				controller.setCurrentAccount(this.currentAccount);
+			}
+			Stage stage = new Stage();
+			stage.setTitle("Add New Resident");
+			stage.setScene(new Scene(root));
+			stage.setResizable(false);
+			stage.showAndWait();
+			loadResidents();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	// Called by the Edit button in the table cell factory
 	public void onEditResident(Resident resident) {

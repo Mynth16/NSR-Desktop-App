@@ -185,7 +185,7 @@ public class HouseholdController extends NavigationBaseController {
 			if (this.currentAccount != null) {
 				controller.setAccount(this.currentAccount);
 			}
-			controller.setEditMode(household); // You must implement setEditMode in AddHouseholdController
+			controller.setEditMode(household);
 			javafx.stage.Stage stage = new javafx.stage.Stage();
 			stage.setTitle("Edit Household");
 			stage.setScene(new javafx.scene.Scene(root));
@@ -217,6 +217,23 @@ public class HouseholdController extends NavigationBaseController {
 				HouseholdDAO dao = new HouseholdDAO();
 				if (dao.softDeleteHousehold(household)) {
 					masterData.setAll(dao.getAllHouseholds());
+					// Audit log for deletion
+					if (this.currentAccount != null) {
+						String userId = this.currentAccount.getId();
+						String zone = household.getZone().replaceFirst("^Zone ", "");
+						String before = "Zone " + zone + ", House " + household.getHouseNumber();
+						String householdId = null;
+						try (java.sql.Connection conn = application.database.DBConnection.getConnection();
+							 java.sql.PreparedStatement stmt = conn.prepareStatement("SELECT household_id FROM households WHERE zone_num = ? AND house_num = ? ORDER BY household_id DESC LIMIT 1")) {
+							stmt.setString(1, household.getZone().replace("Zone ", ""));
+							stmt.setString(2, household.getHouseNumber());
+							java.sql.ResultSet rs = stmt.executeQuery();
+							if (rs.next()) {
+								householdId = rs.getString("household_id");
+							}
+						} catch (Exception e) { e.printStackTrace(); }
+						application.database.AuditTrailDAO.logDelete(userId, "H", householdId, "Deleted household: " + before);
+					}
 				} else {
 					Alert err = new Alert(Alert.AlertType.ERROR, "Failed to delete household.");
 					err.showAndWait();

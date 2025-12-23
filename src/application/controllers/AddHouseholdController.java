@@ -55,8 +55,13 @@ public class AddHouseholdController extends application.controllers.NavigationBa
             showAlert("Zone Number and House Number are required.");
             return;
         }
+        String headResidentId = "-";
+        Resident selectedHead = headResidentCombo.getValue();
+        if (selectedHead != null) {
+            headResidentId = selectedHead.getResidentId();
+        }
         HouseholdDAO dao = new HouseholdDAO();
-        Household newHousehold = new Household(zone, house, "-", 0, "Active");
+        Household newHousehold = new Household(zone, house, headResidentId, 0, "Active");
         boolean success = dao.addHousehold(newHousehold);
         if (success) {
             // Get household_id for audit log
@@ -72,12 +77,13 @@ public class AddHouseholdController extends application.controllers.NavigationBa
             } catch (SQLException e) { e.printStackTrace(); }
             if (this.currentAccount != null) {
                 String userId = this.currentAccount.getId();
-                AuditTrailDAO.logCreate(userId, "H", householdId, "Initial household registration");
+                AuditTrailDAO.logCreate(userId, "H", householdId, "Created household: Zone " + zone + ", House " + house);
             }
             householdAdded = true;
+            closeWindow();
+        } else {
+            showAlert("Failed to add household. Please try again.");
         }
-        closeWindow();
-        showAlert("Failed to add household. Please try again.");
     }
 
     private void updateHousehold() {

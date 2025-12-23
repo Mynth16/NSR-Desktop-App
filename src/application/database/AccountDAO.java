@@ -107,35 +107,6 @@ public class AccountDAO {
         return false;
     }
 
-    // Only Admins can update accounts
-    public boolean updateAccount(String id, String username, String role, String newPasswordOrNull, String currentUserRole) {
-        if (!"Admin".equalsIgnoreCase(currentUserRole) && !"A".equalsIgnoreCase(currentUserRole)) {
-            System.err.println("Permission denied: Only Admins can update accounts.");
-            return false;
-        }
-        boolean updatePassword = newPasswordOrNull != null && !newPasswordOrNull.isEmpty();
-        String sql = updatePassword
-            ? "UPDATE account SET username=?, role=?, password=? WHERE acc_id=?"
-            : "UPDATE account SET username=?, role=? WHERE acc_id=?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, username);
-            stmt.setString(2, role);
-            if (updatePassword) {
-                String hashedPassword = BCrypt.hashpw(newPasswordOrNull, BCrypt.gensalt(12));
-                stmt.setString(3, hashedPassword);
-                stmt.setString(4, id);
-            } else {
-                stmt.setString(3, id);
-            }
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println("Failed to update Account");
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     // Only Admins can delete accounts
     public boolean deleteAccount(String id, String currentUserRole) {
         if (!"Admin".equalsIgnoreCase(currentUserRole) && !"A".equalsIgnoreCase(currentUserRole)) {
@@ -154,7 +125,7 @@ public class AccountDAO {
         return false;
     }
 
-    // Get account id by username (for edit/delete)
+    // Get account id by username (for delete)
     public String getAccountIdByUsername(String username) {
         String sql = "SELECT acc_id FROM account WHERE username = ?";
         try (Connection conn = DBConnection.getConnection();

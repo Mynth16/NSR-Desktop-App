@@ -56,14 +56,12 @@ public class HouseholdDAO {
 			if (oldZone.toLowerCase().startsWith("zone ")) {
 				oldZone = oldZone.substring(5).trim();
 			}
-			System.out.println("[DEBUG] updateHousehold: newZone=" + newZone + ", newHouse=" + newHousehold.getHouseNumber() + ", oldZone=" + oldZone + ", oldHouse=" + oldHousehold.getHouseNumber());
 			stmt.setString(1, newZone);
 			stmt.setString(2, newHousehold.getHouseNumber());
 			stmt.setString(3, "Active".equalsIgnoreCase(newHousehold.getStatus()) ? "A" : "X");
 			stmt.setString(4, oldZone);
 			stmt.setString(5, oldHousehold.getHouseNumber());
 			int affected = stmt.executeUpdate();
-			System.out.println("[DEBUG] Rows affected: " + affected);
 			return affected > 0;
 		} catch (SQLException e) {
 			e.printStackTrace();

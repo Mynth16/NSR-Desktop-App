@@ -61,13 +61,13 @@ public class AddAccountController extends NavigationBaseController {
             // Hide password
             passwordTextField.setVisible(false);
             passwordField.setVisible(true);
-            showPasswordBtn.setText("\uD83D\uDC41"); // 👁
+            showPasswordBtn.setText("\uD83D\uDC41");
         } else {
             // Show password
             passwordTextField.setText(passwordField.getText());
             passwordTextField.setVisible(true);
             passwordField.setVisible(false);
-            showPasswordBtn.setText("\uD83D\uDC41\u200D\uD83D\uDD12"); // 👁‍🔒
+            showPasswordBtn.setText("\uD83D\uDC41\u200D\uD83D\uDD12");
         }
     }
 
@@ -98,7 +98,6 @@ public class AddAccountController extends NavigationBaseController {
         else if (role.equals("Viewer")) roleCode = "V";
         // Get current user role from NavigationBaseController
         String currentUserRole = (this.currentAccount != null && this.currentAccount.getRole() != null) ? this.currentAccount.getRole() : "Viewer";
-        System.out.println("[DEBUG] currentAccount: " + (this.currentAccount != null ? this.currentAccount.getUsername() : "null") + ", role: " + currentUserRole);
         boolean success = accountDAO.addAccount(username, password, roleCode, currentUserRole);
         if (success) {
             if (this.currentAccount != null) {

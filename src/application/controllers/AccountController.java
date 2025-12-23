@@ -13,7 +13,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import application.database.AccountExtraDAO;
 
 public class AccountController extends NavigationBaseController {
 	@FXML
@@ -115,34 +114,29 @@ public class AccountController extends NavigationBaseController {
 			@Override
 			public TableCell<Account, Void> call(final TableColumn<Account, Void> param) {
 				return new TableCell<Account, Void>() {
-					   private final Button editBtn = new Button("Edit");
 					   private final Button deleteBtn = new Button("Delete");
 					   {
-						   editBtn.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;");
 						   deleteBtn.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;");
-						   editBtn.setOnAction(e -> onEditAccount(getTableView().getItems().get(getIndex())));
 						   deleteBtn.setOnAction(e -> deleteAccount(getTableView().getItems().get(getIndex())));
 					   }
-					@Override
-					public void updateItem(Void item, boolean empty) {
-						super.updateItem(item, empty);
-						if (empty) {
-							setGraphic(null);
-						} else if (isAdmin()) {
-							HBox box = new HBox(10, editBtn, deleteBtn);
-							setGraphic(box);
-						} else if (isStaff() || isViewer()) {
-							// Show disabled buttons with tooltip for Staff/Viewer
-							editBtn.setDisable(true);
-							deleteBtn.setDisable(true);
-							editBtn.setTooltip(new Tooltip("Only Admins can edit accounts."));
-							deleteBtn.setTooltip(new Tooltip("Only Admins can delete accounts."));
-							HBox box = new HBox(10, editBtn, deleteBtn);
-							setGraphic(box);
-						} else {
-							setGraphic(null);
-						}
-					}
+					   @Override
+					   public void updateItem(Void item, boolean empty) {
+						   super.updateItem(item, empty);
+						   if (empty) {
+							   setGraphic(null);
+						   } else if (isAdmin()) {
+							   HBox box = new HBox(10, deleteBtn);
+							   setGraphic(box);
+						   } else if (isStaff() || isViewer()) {
+							   // Show disabled button with tooltip for Staff/Viewer
+							   deleteBtn.setDisable(true);
+							   deleteBtn.setTooltip(new Tooltip("Only Admins can delete accounts."));
+							   HBox box = new HBox(10, deleteBtn);
+							   setGraphic(box);
+						   } else {
+							   setGraphic(null);
+						   }
+					   }
 				};
 			}
 		});
@@ -164,34 +158,6 @@ public class AccountController extends NavigationBaseController {
 			stage.setResizable(false);
 			stage.showAndWait();
 			// After closing, reload accounts
-			loadAccounts();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-
-	public void onEditAccount(Account account) {
-		if (!isAdmin() || account == null) return;
-		try {
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("/application/views/edit_account.fxml"));
-			Parent root = loader.load();
-			application.controllers.EditAccountController controller = loader.getController();
-			String id = accountDAO.getAccountIdByUsername(account.getUsername());
-			// Fetch householdId and headResidentId for this account
-			String householdId = null;
-			String headResidentId = null;
-			String[] ids = AccountExtraDAO.getHouseholdAndHeadResidentIdByAccountId(id);
-			if (ids != null) {
-				householdId = ids[0];
-				headResidentId = ids[1];
-			}
-			controller.setAccount(account, id, householdId, headResidentId);
-			Stage stage = new Stage();
-			stage.setTitle("Edit Account");
-			stage.setScene(new Scene(root));
-			stage.setResizable(false);
-			stage.showAndWait();
 			loadAccounts();
 		} catch (Exception e) {
 			e.printStackTrace();
