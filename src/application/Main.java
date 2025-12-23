@@ -13,7 +13,7 @@ public class Main extends Application {
             Scene scene = new Scene(loader.load());
             scene.getStylesheets().add(getClass().getResource("/application/views/styles.css").toExternalForm());
 
-            stage.setTitle("NSR Population Tracker");
+            stage.setTitle("NSR Population Management System");
             stage.setResizable(false);
             stage.setScene(scene);
             stage.centerOnScreen();

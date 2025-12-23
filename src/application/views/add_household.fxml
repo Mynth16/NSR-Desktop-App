@@ -11,6 +11,9 @@
                 <TextField fx:id="zoneNumberField" promptText="Enter zone number"/>
                 <Label text="House Number *" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
                 <TextField fx:id="houseNumberField" promptText="Enter house number"/>
+                <Label text="Head Resident *" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <ComboBox fx:id="headResidentCombo" promptText="Select head resident..." />
+                <Label text="Select the head resident for this household" style="-fx-font-size: 11; -fx-text-fill: #888;" />
             </VBox>
             <HBox spacing="12" alignment="CENTER_RIGHT">
                 <Button fx:id="cancelBtn" text="Cancel" minWidth="80" style="-fx-background-color: #f8f9fa; -fx-text-fill: #444; -fx-border-color: #bbb; -fx-border-radius: 5;"/>

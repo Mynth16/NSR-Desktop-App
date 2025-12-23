@@ -13,6 +13,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import application.database.AccountExtraDAO;
 
 public class AccountController extends NavigationBaseController {
 	@FXML
@@ -177,7 +178,15 @@ public class AccountController extends NavigationBaseController {
 			Parent root = loader.load();
 			application.controllers.EditAccountController controller = loader.getController();
 			String id = accountDAO.getAccountIdByUsername(account.getUsername());
-			controller.setAccount(account, id);
+			// Fetch householdId and headResidentId for this account
+			String householdId = null;
+			String headResidentId = null;
+			String[] ids = AccountExtraDAO.getHouseholdAndHeadResidentIdByAccountId(id);
+			if (ids != null) {
+				householdId = ids[0];
+				headResidentId = ids[1];
+			}
+			controller.setAccount(account, id, householdId, headResidentId);
 			Stage stage = new Stage();
 			stage.setTitle("Edit Account");
 			stage.setScene(new Scene(root));

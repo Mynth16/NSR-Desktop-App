@@ -244,4 +244,49 @@ public class ResidentDAO {
 		}
 		return 0;
 	}
+
+	// Get all residents for a specific household
+	public List<application.models.Resident> getResidentsByHousehold(String householdId) {
+		List<application.models.Resident> list = new ArrayList<>();
+		String sql = "SELECT r.resident_id, CONCAT(r.first_name, ' ', r.last_name) as name, " +
+				"FLOOR(DATEDIFF(CURDATE(), r.birth_date) / 365.25) as age, r.gender, r.civil_status, " +
+				"CONCAT('Zone ', h.zone_num, ' - ', h.house_num) as household, r.contact_number, " +
+				"r.birth_date, r.educational_attainment, r.registered_voter, r.pwd, r.status " +
+				"FROM residents r JOIN households h ON r.household_id = h.household_id " +
+				"WHERE r.status <> 'X' AND r.household_id = ?";
+		try (Connection conn = DBConnection.getConnection();
+			 PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setString(1, householdId);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					String civilStatusCode = rs.getString("civil_status");
+					String civilStatus;
+					switch (civilStatusCode) {
+						case "S": civilStatus = "Single"; break;
+						case "M": civilStatus = "Married"; break;
+						case "W": civilStatus = "Widowed"; break;
+						case "SEP": civilStatus = "Separated"; break;
+						default: civilStatus = civilStatusCode;
+					}
+					list.add(new application.models.Resident(
+							rs.getString("resident_id"),
+							rs.getString("name"),
+							rs.getInt("age"),
+							rs.getString("gender").equals("M") ? "Male" : "Female",
+							civilStatus,
+							rs.getString("household"),
+							rs.getString("contact_number"),
+							rs.getString("birth_date"),
+							rs.getString("educational_attainment"),
+							rs.getBoolean("registered_voter"),
+							rs.getBoolean("pwd"),
+							rs.getString("status")
+					));
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
 }

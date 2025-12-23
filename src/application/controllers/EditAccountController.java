@@ -6,17 +6,28 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
+
+import application.database.HouseholdDAO;
+import application.database.ResidentDAO;
+import application.models.Resident;
+import java.util.List;
+
 public class EditAccountController extends NavigationBaseController {
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     @FXML private Label passwordStrengthLabel;
     @FXML private ProgressBar passwordStrengthBar;
     @FXML private ComboBox<String> roleCombo;
+    @FXML private ComboBox<Resident> headResidentCombo;
     @FXML private Button cancelBtn;
     @FXML private Button saveBtn;
 
     private AccountDAO accountDAO = new AccountDAO();
+    private ResidentDAO residentDAO = new ResidentDAO();
+    private HouseholdDAO householdDAO = new HouseholdDAO();
     private String accountId = null;
+    private String householdId = null;
+
 
     @FXML
     public void initialize() {
@@ -28,14 +39,38 @@ public class EditAccountController extends NavigationBaseController {
         saveBtn.setOnAction(e -> handleSave());
     }
 
-    public void setAccount(Account account, String id) {
+    // Call this to set household context for editing
+    public void setHouseholdContext(String householdId) {
+        this.householdId = householdId;
+        loadResidentsForHousehold();
+    }
+
+    private void loadResidentsForHousehold() {
+        if (householdId == null) return;
+        List<Resident> residents = residentDAO.getResidentsByHousehold(householdId);
+        headResidentCombo.getItems().clear();
+        headResidentCombo.getItems().addAll(residents);
+    }
+
+    public void setAccount(Account account, String id, String householdId, String headResidentId) {
         this.accountId = id;
+        this.householdId = householdId;
         usernameField.setText(account.getUsername());
         // Password left blank for security
         String role = "Admin";
         if ("S".equals(account.getRole())) role = "Staff";
         else if ("V".equals(account.getRole())) role = "Viewer";
         roleCombo.setValue(role);
+        loadResidentsForHousehold();
+        // Set current head resident if available
+        if (headResidentId != null && headResidentCombo.getItems() != null) {
+            for (Resident r : headResidentCombo.getItems()) {
+                if (headResidentId.equals(r.getResidentId())) {
+                    headResidentCombo.setValue(r);
+                    break;
+                }
+            }
+        }
     }
 
     private void updatePasswordStrength(String password) {
@@ -62,6 +97,7 @@ public class EditAccountController extends NavigationBaseController {
         String username = usernameField.getText().trim();
         String password = passwordField.getText();
         String role = roleCombo.getValue();
+        Resident selectedHead = headResidentCombo.getValue();
         if (!username.matches("^[A-Za-z0-9_]{3,30}$")) {
             showAlert("Invalid username. Use 3-30 letters, numbers, or underscores.");
             return;
@@ -74,14 +110,27 @@ public class EditAccountController extends NavigationBaseController {
             showAlert("Please select a role.");
             return;
         }
+        if (selectedHead == null) {
+            showAlert("Please select a head resident.");
+            return;
+        }
 
         String roleCode = "A";
         if (role.equals("Staff")) roleCode = "S";
         else if (role.equals("Viewer")) roleCode = "V";
         String currentUserRole = (this.currentAccount != null && this.currentAccount.getRole() != null) ? this.currentAccount.getRole() : "Viewer";
         boolean success = accountDAO.updateAccount(accountId, username, roleCode, password.isEmpty() ? null : password, currentUserRole);
+        // Update head resident in household
+        if (success && householdId != null && selectedHead != null) {
+            boolean headUpdated = householdDAO.updateHeadResident(householdId, selectedHead.getResidentId());
+            if (headUpdated && this.currentAccount != null) {
+                // Audit log for head resident change
+                String userId = this.currentAccount.getId();
+                application.database.AuditTrailDAO.logUpdate(userId, "H", householdId, "Changed head resident to: " + selectedHead.getName());
+            }
+        }
         if (success && this.currentAccount != null) {
-            // Audit log
+            // Audit log for account update
             String userId = this.currentAccount.getId();
             application.database.AuditTrailDAO.logUpdate(userId, "A", accountId, "Updated account: " + username + " (Role: " + roleCode + ")");
         }

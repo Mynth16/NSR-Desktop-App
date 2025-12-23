@@ -160,4 +160,19 @@ public class HouseholdDAO {
 			return false;
 		}
 	}
+
+	// Update the head resident for a household
+	public boolean updateHeadResident(String householdId, String residentId) {
+		String sql = "UPDATE households SET head_resident_id = ? WHERE household_id = ?";
+		try (Connection conn = DBConnection.getConnection();
+			 PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setString(1, residentId);
+			stmt.setString(2, householdId);
+			int affected = stmt.executeUpdate();
+			return affected > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
 }

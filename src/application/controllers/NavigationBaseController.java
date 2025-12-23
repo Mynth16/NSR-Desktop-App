@@ -47,7 +47,6 @@ public abstract class NavigationBaseController {
             // Get the current stage
             Stage stage = (Stage) logoutBtn.getScene().getWindow();
 
-            // FIX: Reuse the existing scene, just replace the content (root)
             Scene currentScene = stage.getScene();
 
             if (currentScene != null) {

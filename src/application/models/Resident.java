@@ -42,4 +42,8 @@ public class Resident {
 	public String getRegisteredVoter() { return registeredVoter ? "Yes" : "No"; }
 	public boolean isRegisteredVoter() { return registeredVoter; }
 	public boolean isPwd() { return pwd; }
+	@Override
+	public String toString() {
+		return name;
+	}
 }

@@ -62,7 +62,7 @@ public class AddResidentController {
             return;
         }
 
-        // Format birth date
+        // Format birthdate
         String birthDateStr = birthDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
         // Map household to householdId (store only the id, not the display string)
